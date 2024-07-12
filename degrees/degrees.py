@@ -87,28 +87,15 @@ def main():
     read_temp_file()
     print("Data loaded.")
 
-    """source = person_id_for_name("Raquel Welch") #person_id_for_name(input("Name: "))
+    source = person_id_for_name("Hal Willner") #person_id_for_name(input("Name: "))
     if source is None:
         sys.exit("Person not found.")
-    target = person_id_for_name("Brenda Bakke")#person_id_for_name(input("Name: "))
+    target = person_id_for_name("LeVar Burton")#person_id_for_name(input("Name: "))
     if target is None:
-        sys.exit("Person not found.")"""
-    def ultimo(index):
-        nose = str(random.randint(index, 11077520))
-        if people.get(nose):
-            return nose
-        else:
-            return ultimo(index)
+        sys.exit("Person not found.")
         
-    for i in people: #quitar
-        source = i #quitar
-        target = ultimo(int(i))#quitar
-        if  people[source] != None and  people[target] != None:#quitar
-            inicio = time.time()
-            path = shortest_path(source, target)
-            fin = time.time()
-            path.update({"tiempo":(fin-inicio)})
-        print(path)
+    path = shortest_path(source, target)    
+            
             
     if path is None:
         print("Not connected.")
@@ -123,26 +110,16 @@ def main():
             print(f"{i + 1}: {person1} and {person2} starred in {movie}")
 
 peliculasdicc = {}
-def limpiar_peliculas(pelisVistas:list, pelisnuevas:list):
-    for peli in pelisVistas:
-        if peli in pelisnuevas:
-            pelisnuevas.remove(peli)
-    return pelisnuevas
+def limpiar_info(infoguardada:list, infonueva:list):
+    resultadoinfo = 0
+    if len(infonueva) != 0:        
+        resultadoinfo = [info for info in infonueva if info not in infoguardada]
+    return resultadoinfo
 
-def limpiar_estrellas(estrellavista:list, estrellanueva:list):
-    if len(estrellanueva) == 0:
-        return estrellanueva
-    
-    for estrella in estrellanueva:
-        if estrella in estrellavista:
-            estrellanueva.remove(estrella)
-    return estrellanueva
-
-def ValidarPeliculas(peliculassources:list, peliculasTarget:list):
+def ValidarPeliculas(peliculassources:list, peliculasTarget:list):    
     for pelitarget in peliculasTarget:
         if pelitarget in peliculassources:
-            return pelitarget
-        
+            return pelitarget        
     return None
 
 
@@ -166,7 +143,7 @@ def shortest_path(source, target):
     peliculas_lista = people[source]["movies"]
     peliculas_target = people[target]["movies"]
     if len(peliculas_target) == 0 or len(peliculas_lista) == 0:
-        return {"De":people[source]["name"],"A":people[target]["name"],"nodos":len(arbol.get_nodo()), "Hallado por": "No hay relacion" }
+        return None
     
     cola.add_startree(source)
     pelicula_ultima = peliculas_lista[INICIO]
@@ -176,77 +153,34 @@ def shortest_path(source, target):
     
     
     x=0
-    while find == False:
-        info = []
-        os.system("cls")
-        nodos = arbol.get_nodo()
-        #print(f"persona:{nodos}", flush=True)
-        info.append(f"Nodos: {len(nodos)}"+"\n")
-        
-        pelicula_ultima = list(nodos.values())[ULTIMO]
-        #print(f"Pelicula: {pelicula_ultima}", end=" ", flush=True)        
-        info.append(f"Pelicula: {pelicula_ultima}" + "\n")
-        
-        estrellas_nuevas = limpiar_estrellas(cola.get_startree(), movies[pelicula_ultima]["stars"])               
-        info.append(f"total estrellas:{len(estrellas_nuevas)}" + "\n")
-        
-        if target in estrellas_nuevas:
-            arbol.add_node(target, pelicula_ultima)
-            #return convertdictolist(arbol.get_nodo())            
-            return {"De":people[source]["Name"],"A":people[target]["Name"],"nodos":len(arbol.get_nodo()), "Hallado por": "Estrella" }
-        
+    while find == False or len(nodos) > 0:
+        nodos = arbol.get_nodo()        
+        pelicula_ultima = list(nodos.values())    
+        estrellas_nuevas = limpiar_info(cola.get_startree(), movies[pelicula_ultima[ULTIMO]]["stars"])                
         if len(estrellas_nuevas) != 0:            
-            source = estrellas_nuevas[ULTIMO]
-            cola.add_startree(source)            
-            info.append(f"Persona nueva:{source}" + "\n")
+            source = estrellas_nuevas[ULTIMO]            
+            cola.add_startree(source)
+            peliculas = people[source]["movies"]           
             
-            peliculas = people[source]["movies"]            
-            peliculas_lista = limpiar_peliculas(cola.get_movietree(), peliculas)
-            validar_pelicula = ValidarPeliculas(peliculas, peliculas_target)            
-            info.append(f"Total pelis:{len(peliculas_lista)}" + "\n")
+            peliculas_lista = limpiar_info(cola.get_movietree(), peliculas)
+            validar_pelicula = ValidarPeliculas(peliculas, peliculas_target)
             
-            if validar_pelicula:
-                arbol.add_node(target,validar_pelicula)                
-                return {"De":people[source]["name"],"A":people[target]["name"],"nodos":len(arbol.get_nodo()), "Hallado por": "Peliculas" }
-                #return convertdictolist(arbol.get_nodo())
-                
+            if validar_pelicula:                
+                arbol.add_node(target,validar_pelicula)                            
+                return convertdictolist(arbol.get_nodo())                
             
             if len(peliculas_lista) != 0:
-                pelicula_ultima = peliculas_lista[INICIO]#pelicula_nueva = peliculas_lista[INICIO]
+                pelicula_ultima = peliculas_lista[INICIO]                
                 arbol.add_node(source, pelicula_ultima)                
-                info.append(f"Agregar nodo:({source},{pelicula_ultima})" + "\n")
-                
-                cola.add_movietree(pelicula_ultima)                
-                info.append(f"Añadir peli: {pelicula_ultima}" + "\n")
-            else:                
-                peliculas = people[source]["movies"]
-                peliculas_lista = limpiar_peliculas(cola.get_movietree(), peliculas)
-
+                cola.add_movietree(pelicula_ultima)
         else:
             nodo_llave = []
             nodo_llave = list(arbol.get_nodo().keys())
             if len(nodo_llave) != 0:
                 arbol.del_node(nodo_llave[ULTIMO])
-            else:
-                return {"De":people[source]["name"],"A":people[target]["name"],"nodos":len(arbol.get_nodo()), "Hallado por": "No hay mas nodos" }
-                #return convertdictolist(arbol.get_nodo())
-        
-        x=x+1
-        info.append(f"REviciones:{x}" + "\n")       
-        for data in info: sys.stdout.write(data)
-        
-        #sys.stdout.flush()
-    
-
-        
-        
-    
-            
-        
-
-    
-    
-
+            else:                
+                return convertdictolist(arbol.get_nodo())
+    return None    
 
 def person_id_for_name(name):
     """
