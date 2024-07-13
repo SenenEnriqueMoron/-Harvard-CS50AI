@@ -19,7 +19,7 @@ def load_data(directory):
     """
     Load data from CSV files into memory.
     """
-    
+    sys.path.append(".")
     # Load people
     with open(f"degrees/{directory}/people.csv", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -79,18 +79,18 @@ def convertdictolist(entrada:dict)->list:
 def main():
     if len(sys.argv) > 2:
         sys.exit("Usage: python degrees.py [directory]")
-    directory = sys.argv[1] if len(sys.argv) == 2 else "large"
+    directory = sys.argv[1] if len(sys.argv) == 2 else "small"#large
 
     # Load data from files into memory
     print("Loading data...")
-    #load_data(directory)
-    read_temp_file()
+    load_data(directory)
+    #read_temp_file()
     print("Data loaded.")
 
-    source = person_id_for_name("Hal Willner") #person_id_for_name(input("Name: "))
+    source = person_id_for_name(input("Name: "))
     if source is None:
         sys.exit("Person not found.")
-    target = person_id_for_name("LeVar Burton")#person_id_for_name(input("Name: "))
+    target = person_id_for_name(input("Name: "))
     if target is None:
         sys.exit("Person not found.")
         
@@ -224,4 +224,4 @@ def neighbors_for_person(person_id):
 if __name__ == "__main__":
     main()
 
-# ToDo : validar si hay duplicados
+# ToDo : vlimpiar codigo
